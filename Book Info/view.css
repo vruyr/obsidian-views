@@ -1,0 +1,3 @@
+.next-table-no-header + * .table-view-thead {
+	display: none;
+}
