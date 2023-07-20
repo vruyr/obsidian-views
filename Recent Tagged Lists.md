@@ -32,6 +32,10 @@ function renderList(list, indentLevel, outputArray) {
 	}
 }
 
+function toTitleCase(s) {
+	return s.charAt(0).toUpperCase() + s.substr(1);
+}
+
 let dayToPageToListItems = dv
 	.pages(pageSearch)
 	.file.lists
@@ -45,8 +49,9 @@ let dayToPageToListItems = dv
 
 const markdown = [];
 
-for(const {key: day, rows: pageToListItems} of dayToPageToListItems) {
-	markdown.push(`## ${dv.date(day).toFormat("EEEE, MMMM d, y")}`)
+for(let {key: day, rows: pageToListItems} of dayToPageToListItems) {
+	day = dv.date(day);
+	markdown.push(`## ${toTitleCase(day.toRelativeCalendar())}, ${day.toFormat("EEEE, MMMM d, y")}`)
 	for(const {key: path, rows: listItems} of pageToListItems) {
 		markdown.push(`- [[${path.replace(/\.md$/, "")}]]`);
 		renderList(listItems, 1, markdown);
