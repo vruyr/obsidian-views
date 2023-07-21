@@ -40,7 +40,7 @@ let dayToPageToListItems = dv
 	.pages(pageSearch)
 	.file.lists
 	.where(i => hasTheTags(i) && isDateWithinRange(i))
-	.groupBy(i => i.theDate.startOf("day"))
+	.groupBy(i => i.theDate.startOf("day").toISODate())
 	.sort(i => i.key, "asc")
 	.map(i => ({
 		key: i.key,
