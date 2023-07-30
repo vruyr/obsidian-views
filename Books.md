@@ -1,8 +1,11 @@
----
-cssClass: cards, cards-2-3, cards-align-bottom
----
 
 ```dataviewjs
+
+// https://forum.obsidian.md/t/possible-to-apply-css-class-cards-not-to-every-dataview-table/47563/4
+dv.container.classList.add("cards");
+dv.container.classList.add("cards-2-3");
+dv.container.classList.add("cards-align-bottom");
+
 function formatDate(t, showDuration) {
 	if(!(t instanceof dv.luxon.DateTime)) {
 		try {
@@ -28,7 +31,6 @@ const basicFieldNames = [
 	["Cover", "Title", "Authors", "Edition", "Words", "Pages"],
 ];
 function basicFieldValuesGen(page) {
-	console.log(page);
 	let ee = dv.array(page?.book?.editions);
 	return [
 		`![](${ee.cover[0]})`,
@@ -99,14 +101,18 @@ dv.table(
 - [ ] Format numbers in the Words column to have thousand separators.
 - [ ] Align the Words column right.
 
-| Title                                                                                        |   Words | Author                            |
-| -------------------------------------------------------------------------------------------- | -------:| --------------------------------- |
-| One Up on Wall Street_ How to Use What You Already Know to Make Money In                     | 100,879 | Peter Lynch                       |
-| Refactoring_ Improving the Design of Existing Code                                           | 105,814 | Martin Fowler                     |
-| OpenGL Programming Guide_ The Official Guide to Learning OpenGL, Version 4.3, Eighth Edition | 231,762 | Dave Shreiner                     |
-| FreeBSD Handbook                                                                             | 266,618 | The FreeBSD Documentation Project |
-| Thinking in Java                                                                             | 362,385 | Bruce Eckel                       |
-
+```dataviewjs
+dv.table(
+	["Title", "Words", "Author"],
+	[
+		["One Up on Wall Street_ How to Use What You Already Know to Make Money In", 100879, "Peter Lynch"],
+		["Refactoring_ Improving the Design of Existing Code", 105814, "Martin Fowler"],
+		["OpenGL Programming Guide_ The Official Guide to Learning OpenGL, Version 4.3, Eighth Edition", 231762, "Dave Shreiner"],
+		["FreeBSD Handbook", 266618, "The FreeBSD Documentation Project"],
+		["Thinking in Java", 362385, "Bruce Eckel"],
+	]
+)
+```
 
 ---
 
