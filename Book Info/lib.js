@@ -19,19 +19,15 @@ ProgressLog.prototype.pctstr = function() {
 	return this.percentage().toLocaleString(undefined, {style: "percent", minimumFractionDigits: 1, maximumFractionDigits: 1});
 }
 
-const fancyArrayPrototype = {
-	get last() {
-		return this[this.length - 1];
+const FancyArrayPrototype = Object.create(Array.prototype, {
+	last: {
+		enumerable: false,
+		configurable: false,
+		get: function() {
+			return this[this.length - 1];
+		},
 	}
-};
-
-Object.setPrototypeOf(fancyArrayPrototype, Array.prototype);
-
-function makeFancyArray() {
-	let result = [...arguments];
-	Object.setPrototypeOf(result, fancyArrayPrototype);
-	return result;
-}
+});
 
 function getProgressLogs(page) {
 	const resultFlat = Object.entries(
@@ -61,15 +57,15 @@ function getProgressLogs(page) {
 		return [resultFlat]
 	}
 
-	const result = makeFancyArray(
-		makeFancyArray(resultFlat[0]),
-	);
+	const result = Object.create(FancyArrayPrototype);
+	result.push(Object.create(FancyArrayPrototype));
+	result.last.push(resultFlat[0]);
 
 	for(let i = 1; i < resultFlat.length; i++) {
 		if(resultFlat[i - 1].percentage() > resultFlat[i].percentage()) {
-			result.push(makeFancyArray());
+			result.push(Object.create(FancyArrayPrototype));
 		}
-		result[result.length - 1].push(resultFlat[i]);
+		result.last.push(resultFlat[i]);
 	}
 
 	return result;
