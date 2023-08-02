@@ -20,13 +20,20 @@ ProgressLog.prototype.pctstr = function() {
 }
 
 const FancyArrayPrototype = Object.create(Array.prototype, {
+	first: {
+		enumerable: false,
+		configurable: false,
+		get: function() {
+			return this[0];
+		},
+	},
 	last: {
 		enumerable: false,
 		configurable: false,
 		get: function() {
 			return this[this.length - 1];
 		},
-	}
+	},
 });
 
 function getProgressLogs(page) {
@@ -117,4 +124,6 @@ return {
 	getProgressLogs,
 	isObsidianMobile,
 	formatDateRange,
+	formatDate,
+	formatDuration,
 }
