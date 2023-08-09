@@ -89,7 +89,7 @@ dv.table(["", ""], summaryTable);
 const references = [];
 
 if(!lib.isObsidianMobile()) {
-	//TODO:vruyr Rethink the Calibre search. Perhaps search all the identifier of all editions.
+	//TODO Rethink the Calibre search. Perhaps search all the identifier of all editions.
 	const firstId = bookEditionSelected.identifiers[0];
 	const calibreSearch = `identifiers:"=${firstId.type}:${firstId.id}"`;
 	const l = new Buffer(lib.CALIBRE_LIBRARY).toString("hex");

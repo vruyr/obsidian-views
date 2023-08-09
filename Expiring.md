@@ -17,7 +17,7 @@ for(const p of pagesWithExpirations.sort(p => p.earliestExpiration, "asc")) {
 	if(p.expires) {
 		const fileExpirations = Array.isArray(p.expires) ? p.expires : [p.expires];
 		dv.paragraph(fileLink)
-		//TODO:vruyr This is unfinished
+		//TODO This is unfinished
 		for(const d of fileExpirations) {
 			dv.span("- ");
 			dv.span(d);
