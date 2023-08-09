@@ -1,13 +1,14 @@
 ---
 onlyInPages:
-notOlderThan: 3 days
-onlyTaggedWith: [StatusUpdate, Achievement]
+notOlderThan: 7 days
+onlyTaggedWith: []
 ---
 
 ```dataviewjs
 const pageSearch = dv.current().onlyInPages;
 const notOlderThan = dv.duration(dv.current().notOlderThan);
 const cutoffDate = dv.date("now").startOf("day").minus(notOlderThan);
+const eodToday = dv.date("now").endOf("day");
 const anyTags = new Set(dv.array(dv.current().onlyTaggedWith).filter(t => t).map(t => `#${t}`));
 
 function hasTheTags(listItem) {
@@ -18,7 +19,7 @@ function isDateWithinRange(listItem) {
 	if(!(listItem.theDate = listItem.date ? listItem.date : dv.date(dv.page(listItem.path).file.name))) {
 		return false;
 	}
-	return listItem.theDate >= cutoffDate;
+	return cutoffDate <= listItem.theDate && listItem.theDate <= eodToday;
 }
 
 function renderList(list, indentLevel, outputArray) {
