@@ -17,8 +17,11 @@ function trimSuffix(str, suffix) {
 	return str.substring(0, str.length - suffix.length);
 }
 
-let tags = new Set(dv.pages()
-	.where(p => !p.file.path.startsWith("Templates"))
+const pagesConsidered = dv.pages().where(p => !(
+	p.file.path.startsWith("Templates") || p.file.path.startsWith("Views")
+));
+
+let tags = new Set(pagesConsidered
 	.where(p => p.file.tags.length)
 	.map(p => p.file.etags).to("values")
 );
@@ -38,8 +41,7 @@ if(offenders.size) {
 	for(const tag of offenders) {
 		outputLines.push(indent(1, `- ${tag}`));
 		outputLines.push(indent(2, dv.markdownList(
-			dv.pages()
-			.where(p => !p.file.path.startsWith("Templates"))
+			pagesConsidered
 			.where(p => p.file.etags.indexOf(tag) >= 0)
 			.map(p => `[[${p.file.path.replace(/\.md$/, "")}]]`)
 		)));
