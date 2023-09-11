@@ -1,6 +1,6 @@
 const READING_SPEEDS_WPM = [150, 300];
 const CALIBRE_LIBRARY = "Calibre";
-const PROGRESS_LOG_KEY_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+const PROGRESS_LOG_KEY_REGEX = /^(?<date>\d{4}-\d{2}-\d{2})(?:-(?<hours>\d{2})(?<minutes>-\d{2})(?:(?<seconds>-\d{2})(?:(?<tz1>[-+]\d{2})(?<tz2>\d{2}))?)?)?$/;
 const PROGRESS_LOG_VAL_REGEX = /^\s*(?:(?:on\s*)?page)?\s*(?<page>\d+)\s*\/\s*(?<total>\d+)(?:(?!\d)[\s-:]*(?<note>.*))?\s*$/i;
 
 function makeArray(o) {
@@ -40,10 +40,19 @@ function getProgressLogs(page) {
 	const resultFlat = Object.entries(
 		page
 	).flatMap(([k, v]) => {
-		if(!PROGRESS_LOG_KEY_REGEX.test(k)) {
+		let m = PROGRESS_LOG_KEY_REGEX.exec(k);
+		if(m == null) {
 			return [];
 		}
+		{
+			let {date, hours, minutes, seconds, tz1, tz2} = m.groups;
+			let time = hours && minutes ? `${hours}${minutes}${seconds || ""}` : "";
+			time = time ? "T" + time.replace(/-/g, ":") : "";
+			let tz = tz1 && tz2 ? `${tz1}:${tz2}` : "";
+			k = `${date}${time}${tz}`;
+		}
 		k = dv.date(k);
+
 		v = makeArray(v).flatMap(x => {
 			const m = PROGRESS_LOG_VAL_REGEX.exec(x);
 			if(!m) {
