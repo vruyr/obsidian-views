@@ -3,6 +3,8 @@ aliases: [Available Tasks]
 ---
 
 ```dataviewjs
+const COMPLETED_TASK_STATUSES = new Set(["x", "-"]);
+
 for(const p of dv.pages()
 	.where(p => !p.file.path.startsWith("Templates/") && p.file.tasks.where(t => !t.completed).length)
 	.sort(p => p.file.mtime, "desc")
@@ -14,7 +16,7 @@ for(const p of dv.pages()
 	);
 	const mtime = p.file.mtime.toRelative({style: "short", unit: ["years", "weeks", "days", "hours", "minutes"]});
 
-	const pending = p.file.tasks.where(t => !t.completed);
+	const pending = p.file.tasks.where(t => !COMPLETED_TASK_STATUSES.has(t.status));
 	const available = pending.where(t => !(t.defer && dv.compare(t.defer, dv.date("now")) > 0));
 	const deferred = pending.where(t => (t.defer && dv.compare(t.defer, dv.date("now")) > 0));
 
