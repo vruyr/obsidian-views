@@ -18,7 +18,7 @@
 	- second on second
 	- [ ] Task on second level \
 	      Second line of task.
-		- A sub-bullet of task. [due::2022-12-16T18:21:35-05:00] [defer::2022-12-17] [bar::baz]
+		- A sub-bullet of task. [due::2022-12-16T18:21:35-05:00]  [defer::2022-12-17]  [bar::baz]
 - second of top
 - [ ] Task
 	- [ ] Subtask 1
