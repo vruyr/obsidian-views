@@ -1,6 +1,10 @@
 function main() {
 	const currentPage = dv.current();
 	const currentPageDate = dv.date(currentPage.file.name);
+	if(currentPageDate == null) {
+		dv.paragraph("> [!ERROR] Current page title is not a date. Probably it's a template.");
+		return;
+	}
 
 	const pagesReferring = dv.pages().where(
 		p => (
