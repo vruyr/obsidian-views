@@ -1,15 +1,17 @@
 ---
-cssClass: [dataview-inline-field-key-monospace, dataview-inline-field-value-monospace, dataview-inline-field-standalone-monospace]
+cssclasses:
+  - dataview-inline-field-key-monospace
+  - dataview-inline-field-value-monospace
+  - dataview-inline-field-standalone-monospace
+search: '-"Templates" and #Shopping and -#Shopping/Research and -#Shopping/Consumables and -#Shopping/Services'
 ---
-
-Search:: -"Templates" and #Shopping and -#Shopping/Research and -#Shopping/Consumables and -#Shopping/Services
 
 ```dataviewjs
 const current = dv.current();
 
-console.log("Searching for", JSON.stringify(current.Search));
+console.log("Searching for", JSON.stringify(current.search));
 
-let out = dv.pages(current.Search)
+let out = dv.pages(current.search)
 	.where(p => p.file.path !== current.file.path)
 	.groupBy(p => Array.from(p.file.etags).toSorted().join(" "))
 	.flatMap(({key, rows}) => ([
