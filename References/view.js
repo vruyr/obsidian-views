@@ -17,7 +17,7 @@ function main() {
 			)
 		)
 	).map(
-		p => p.file.link
+		p => [p.file.folder, p.file.link].filter(x => x).join("/")
 	);
 
 	if(pagesReferring.length) {
