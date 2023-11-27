@@ -1,8 +1,4 @@
 ---
-cssclasses:
-  - dataview-inline-field-key-monospace
-  - dataview-inline-field-value-monospace
-  - dataview-inline-field-standalone-monospace
 search: '-"Templates" and #Shopping and -#Shopping/Research and -#Shopping/Consumables and -#Shopping/Services'
 ---
 
