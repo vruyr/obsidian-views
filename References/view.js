@@ -1,4 +1,7 @@
-function main() {
+async function main() {
+	while(!dv.current()) {
+		await sleep(100);
+	}
 	const currentPage = dv.current();
 	const currentPageDate = dv.date(currentPage.file.name);
 	if(currentPageDate == null) {
@@ -66,7 +69,7 @@ function convertToDateTime(key, value) {
 		}
 		return dv.date(value);
 	} catch(e) {
-		console.log("Value", value, "at key", [key], "could not be converted to DateTime", e);
+		//DEBUG: console.log("Value", value, "at key", [key], "could not be converted to DateTime", e);
 		return null;
 	}
 }
@@ -103,6 +106,12 @@ function pageHasFieldsForDay(page, date) {
 	}
 
 	return false;
+}
+
+async function sleep(milliseconds) {
+	await new Promise(resolve => {
+		setTimeout(resolve, milliseconds);
+	});
 }
 
 try {

@@ -1,5 +1,8 @@
-function main() {
+async function main() {
 	const COMPLETED_TASK_STATUSES = new Set(["x", "-"]);
+	while(!dv.current()) {
+		await sleep(100);
+	}
 	const currentPage = dv.current();
 	const currentPageDate = dv.date(currentPage.file.name);
 	if(currentPageDate == null) {
@@ -30,6 +33,11 @@ function main() {
 	}
 }
 
+async function sleep(milliseconds) {
+	await new Promise(resolve => {
+		setTimeout(resolve, milliseconds);
+	});
+}
 
 try {
 	main()
