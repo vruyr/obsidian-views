@@ -7,7 +7,8 @@ const FAIL = "❌"
 const outputLines = [];
 
 function indent(count, str) {
-	return "\t".repeat(count) + str.replaceAll(/\n/g, "\t".repeat(count) + "\n");
+	const the_indent = "\t".repeat(count);
+	return the_indent + str.replaceAll(/\n/g, "\n" + the_indent);
 }
 
 function trimSuffix(str, suffix) {
@@ -64,3 +65,4 @@ if(offenders.length) {
 
 dv.paragraph(outputLines.join("\n"));
 ```
+- Find all images that do not have any pages using them.
