@@ -20,7 +20,13 @@ async function main() {
 		.sort(p => p.file.name, "asc")
 	) {
 		const pending = p.file.tasks.where(t => !COMPLETED_TASK_STATUSES.has(t.status));
-		const available = pending.where(t => !(t.defer && dv.compare(t.defer, currentPageDate) > 0));
+		const available = pending.where(t => (!t.defer ||
+			// Either should have no defer date or all the defer dates should be in the past.
+			dv.compare(
+				(dv.isArray(t.defer) ? t.defer : dv.array([t.defer])).sort().last(),
+				currentPageDate
+			) <= 0
+		));
 
 		if(available.length) {
 			dv.taskList(available);
