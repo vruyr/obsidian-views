@@ -69,13 +69,18 @@ function getProgressLogs(page) {
 		a.date.valueOf() - b.date.valueOf() || a.percentage() - b.percentage()
 	));
 
-	if(resultFlat.length < 2) {
-		return [resultFlat]
+	const result = Object.create(FancyArrayPrototype);
+
+	if(resultFlat.length < 1) {
+		return result;
 	}
 
-	const result = Object.create(FancyArrayPrototype);
 	result.push(Object.create(FancyArrayPrototype));
 	result.last.push(resultFlat[0]);
+
+	if(resultFlat.length < 2) {
+		return result;
+	}
 
 	for(let i = 1; i < resultFlat.length; i++) {
 		if(resultFlat[i - 1].percentage() > resultFlat[i].percentage()) {
