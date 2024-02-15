@@ -38,11 +38,25 @@ function formatDate(t, showDuration) {
 	return result;
 }
 
-dv.paragraph("# Books")
+const allBookPages = dv.pages('"Catalog/Books"');
+
+//
+// Notes that are not formatted like a book
+//
+
+dv.paragraph("## Notes")
+dv.list(allBookPages
+	.where(i => !i.book)
+	.map(i => i.file.link)
+);
 
 
-const books = dv
-	.pages('"Catalog/Books"')
+//
+// Notes properly formatted like books
+//
+
+
+const books = allBookPages
 	.where(i => i.book)
 	.map(page => {
 		const progressLogs = libBookInfo.getProgressLogs(page);
@@ -51,7 +65,7 @@ const books = dv
 
 		let status = null;
 		let statusSort = 0;
-		if(progressLogs.last.length === 0) {
+		if((progressLogs.last?.length ?? 0) === 0) {
 			statusSort = 1;
 			status = "Never Read";
 		} else if(progressLogs.last.last.page === progressLogs.last.last.total) {
@@ -98,38 +112,50 @@ function basicFieldValuesGen(page) {
 		page?.bookStatus,
 	];
 }
-dv.table(
-	[...basicFieldNames],
-	books
-	.map(i => [
-		...basicFieldValuesGen(i),
-	])
-);
+
+const booksSeen = new Set();
+const booksByStatus = [
+	["Reading", books.where(i => {
+		if(!booksSeen.has(i.file.path) && i.bookStatus.startsWith("Reading")) {
+			booksSeen.add(i.file.path);
+			return true;
+		}
+		return false;
+	})],
+	["Unread", books.where(i => {
+		if(!booksSeen.has(i.file.path) && i.bookStatus.startsWith("Never Read")) {
+			booksSeen.add(i.file.path);
+			return true;
+		}
+		return false;
+	})],
+	["Finished", books.where(i => {
+		if(!booksSeen.has(i.file.path) && i.bookStatus.startsWith("Read ")) {
+			booksSeen.add(i.file.path);
+			return true;
+		}
+		return false;
+	})],
+	["Other", books.where(i => {
+		return !booksSeen.has(i.file.path);
+	})],
+];
+
+for(const [section, booksSelected] of booksByStatus) {
+	if(!booksSelected.length) {
+		continue;
+	}
+
+	dv.paragraph(`## ${section}`);
+	dv.table(
+		[...basicFieldNames],
+		booksSelected
+		.map(i => [
+			...basicFieldValuesGen(i),
+		])
+	);
+	// dv.paragraph("\n\n");
+}
 
 
 ```
-
----
-
-- [ ] Format numbers in the Words column to have thousand separators.
-- [ ] Align the Words column right.
-
-```dataviewjs
-dv.table(
-	["Title", "Words", "Author"],
-	[
-		["One Up on Wall Street_ How to Use What You Already Know to Make Money In", 100879, "Peter Lynch"],
-		["Refactoring_ Improving the Design of Existing Code", 105814, "Martin Fowler"],
-		["OpenGL Programming Guide_ The Official Guide to Learning OpenGL, Version 4.3, Eighth Edition", 231762, "Dave Shreiner"],
-		["FreeBSD Handbook", 266618, "The FreeBSD Documentation Project"],
-		["Thinking in Java", 362385, "Bruce Eckel"],
-	]
-)
-```
-
----
-
-Building A Book Library In Obsidian - YouTube
-https://www.youtube.com/watch?v=7PFFJlyiv28
-
----
