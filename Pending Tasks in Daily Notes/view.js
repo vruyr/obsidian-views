@@ -12,7 +12,10 @@ async function main() {
 	let numTaskListsRendered = 0;
 	for(const p of dv.pages()
 		.where(p => (
-			/\d{4}-\d{2}-\d{2}/.test(p.file.name) &&
+			// Some files are names “YYYY-MM-DD [Then The Subject Matter]”.
+			// We don't consider those here, but they are a good candudate
+			// to be picked up as project files along with “GG[W]WW Subject Matter”.
+			/^\d{4}-\d{2}-\d{2}$/.test(p.file.name) &&
 			dv.compare(dv.date(p.file.name), currentPageDate) <= 0 &&
 			p.file.path != dv.current().file.path &&
 			p.file.tasks.where(t => !t.completed).length
