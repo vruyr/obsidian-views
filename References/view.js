@@ -24,10 +24,23 @@ async function main() {
 	);
 
 	if(pagesReferring.length) {
+		renderTheHeadingIfNotAlready();
 		dv.list(pagesReferring);
-	} else {
+	} else if(input.alwaysShow) {
+		renderTheHeadingIfNotAlready();
 		dv.paragraph("(none)");
 	}
+}
+
+
+let headingAlreadyRendered = false;
+
+function renderTheHeadingIfNotAlready() {
+	if(headingAlreadyRendered || !input.heading) {
+		return;
+	}
+	headingAlreadyRendered = true;
+	dv.paragraph(input.heading);
 }
 
 
