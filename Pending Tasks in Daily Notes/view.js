@@ -26,10 +26,16 @@ async function main() {
 	) {
 		let tasksPending;
 
+		let showAllPendingTasks = page.showAllPendingTasks || false;
+
 		if(
 			/^\d{4}-\d{2}-\d{2}$/.test(page.file.name) &&             // This is a daily journal page
 			dv.compare(dv.date(page.file.name), currentPageDate) < 0  // ... for a prior day
 		) {
+			showAllPendingTasks = true;
+		}
+
+		if(showAllPendingTasks) {
 			// Take all pending tasks
 			tasksPending = page.file.tasks.where(t => !TASK_STATUSES_DONE.has(t.status));
 		} else {
