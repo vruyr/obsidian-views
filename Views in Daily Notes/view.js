@@ -34,8 +34,8 @@ async function main() {
 	}
 
 	// https://momentjs.com/docs/#/displaying/format/
-	const dayByWeek = currentPageDate.format("gg[W]wwdd").toUpperCase();
-	const dayByMonth = currentPageDate.format("MMMM D, YYYY")
+	const dayByWeek = momentToYearWeekDay(currentPageDate);
+	const dayByMonth = currentPageDate.format("dddd, MMMM D, YYYY");
 
 	dv.paragraph(`# ${dayByWeek} – ${dayByMonth} – ${dateLabel}`);
 
@@ -51,6 +51,16 @@ async function main() {
 		heading: "## References",
 		alwaysShow: true,
 	});
+}
+
+//See also: 09C21192-BFBC-4E19-943E-BC961D492D5E
+function momentToYearWeekDay(m) {
+	// https://momentjs.com/docs/#/displaying/format/
+	let result = m.format("gg[W]ww[D]").toUpperCase();
+	// https://momentjs.com/docs/#/get-set/weekday/
+	result += (m.isoWeekday() % 7 + 1).toString();
+
+	return result;
 }
 
 async function waitForCurrentPage() {
