@@ -51,12 +51,7 @@ async function main() {
 
 		//TODO Ignore the defer date for tasks that were picked because of the due date.
 		// Available tasks either should have no defer date or all the defer dates should be in the past.
-		const tasksAvailable = tasksPending.where(t => (!t.defer ||
-			dv.compare(
-				(dv.isArray(t.defer) ? t.defer : dv.array([t.defer])).sort().last(),
-				currentPageDate
-			) <= 0
-		));
+		const tasksAvailable = tasksPending.where(t => !isTaskDeferred(currentPageDate, t, page));
 
 		if(!tasksAvailable.length) {
 			continue;
@@ -73,6 +68,25 @@ async function main() {
 		renderTheHeadingIfNotAlready();
 		dv.paragraph("(none)");
 	}
+}
+
+
+function isTaskDeferred(relativeToDate, task, page) {
+	const taskDeferDate = getTaskDeferDate(task, page);
+	if(taskDeferDate == null) {
+		return false;
+	}
+	return dv.compare(relativeToDate, taskDeferDate) < 0;
+}
+
+
+function getTaskDeferDate(task, page) {
+	// https://blacksmithgu.github.io/obsidian-dataview/annotation/metadata-tasks/
+	if(!page) {
+		page = dv.page(task.path);
+	}
+	//TODO Only consider page deferrals from the same heading as the task itself.
+	return [].concat(page.defer ?? [], task.defer ?? []).sort().last();
 }
 
 
