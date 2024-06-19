@@ -104,7 +104,7 @@ function pageHasFieldsForDay(page, date) {
 			}
 		}
 	}
-["symbol", "link", "section", ]
+
 	const moreDates = page.file.tasks
 		.flatMap(t => Object.entries(t)
 		.filter(([k, v]) => !NON_DATETIME_TASK_PROPS.has(k))
