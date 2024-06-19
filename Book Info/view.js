@@ -43,9 +43,9 @@ summaryTable.push(["---", "---"]);
 
 let progressLogs = lib.getProgressLogs(page).last;
 
-if(progressLogs.length) {
-	const first = progressLogs[0];
-	const last = progressLogs[progressLogs.length - 1];
+if(progressLogs?.length) {
+	const first = progressLogs.first;
+	const last = progressLogs.last;
 	const pct = last.percentage();
 	let wordsPerDay = null;
 	if(pct && statsWords) {
