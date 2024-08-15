@@ -10,12 +10,9 @@ async function main() {
 	}
 	const currentPage = dv.current();
 	const currentPageDate = dv.date(currentPage.file.name);
-	const dueDateToShow = currentPageDate.plus({days: 6}); // This day plus six is a week.
 
-	if(currentPageDate == null) {
-		dv.paragraph("> [!ERROR] Current page title is not a date. Probably it's a template.");
-		return;
-	}
+	// This day plus six days is a week.
+	const dueDateToShow = currentPageDate != null ? currentPageDate.plus({days: 6}) : null;
 
 	dv.container.classList.add("no-task-highlight-started");
 
@@ -28,10 +25,7 @@ async function main() {
 
 		let showAllPendingTasks = page.showAllPendingTasks || false;
 
-		if(
-			/^\d{4}-\d{2}-\d{2}$/.test(page.file.name) &&             // This is a daily journal page
-			dv.compare(dv.date(page.file.name), currentPageDate) < 0  // ... for a prior day
-		) {
+		if(isADailyJournalPageForPriorDay(currentPageDate, page)) {
 			showAllPendingTasks = true;
 		}
 
@@ -42,10 +36,7 @@ async function main() {
 			// For all other pages, take all pending but not untouched tasks.
 			tasksPending = page.file.tasks.where(t => (
 				!TASK_STATUSES_INACTIVE.has(t.status) ||
-				(
-					!TASK_STATUSES_DONE.has(t.status) &&
-					t.due && dv.compare(dv.date(t.due), dueDateToShow) <= 0
-				)
+				(!TASK_STATUSES_DONE.has(t.status) && isTaskDue(dueDateToShow, t))
 			));
 		}
 
@@ -57,7 +48,7 @@ async function main() {
 			continue;
 		}
 
-		renderTheHeadingIfNotAlready();
+		renderTheHeadingIfNotAlready(currentPageDate);
 		dv.paragraph(`${input.pageHeadingPrefix}${page.file.folder ? page.file.folder + "/" : ""}[[/${page.file.path}|${page.file.name}]]`);
 		//TODO Render tasksAvailable with their ancestor chain. This will require building a proper tree to group multiple available tasks of a single parent task.
 		dv.taskList(tasksAvailable, false);
@@ -65,13 +56,40 @@ async function main() {
 	}
 
 	if(numTaskListsRendered == 0 && input.alwaysShow) {
-		renderTheHeadingIfNotAlready();
+		renderTheHeadingIfNotAlready(currentPageDate);
 		dv.paragraph("(none)");
 	}
 }
 
 
+function isADailyJournalPageForPriorDay(relativeToDate, page) {
+	if(!/^\d{4}-\d{2}-\d{2}$/.test(page.file.name)) {
+		return false;
+	}
+
+	if(relativeToDate == null) {
+		return true;
+	}
+
+	return dv.compare(dv.date(page.file.name), relativeToDate) < 0;
+}
+
+
+function isTaskDue(relativeToDate, task) {
+	if(!task.due) {
+		return false;
+	}
+	if(relativeToDate == null) {
+		return true;
+	}
+	return dv.compare(dv.date(task.due), relativeToDate) <= 0;
+}
+
+
 function isTaskDeferred(relativeToDate, task, page) {
+	if(relativeToDate == null) {
+		return false;
+	}
 	const taskDeferDate = getTaskDeferDate(task, page);
 	if(taskDeferDate == null) {
 		return false;
@@ -92,12 +110,18 @@ function getTaskDeferDate(task, page) {
 
 let headingAlreadyRendered = false;
 
-function renderTheHeadingIfNotAlready() {
-	if(headingAlreadyRendered || !input.heading) {
+function renderTheHeadingIfNotAlready(currentPageDate) {
+	if(headingAlreadyRendered) {
 		return;
 	}
+
 	headingAlreadyRendered = true;
-	dv.paragraph(input.heading);
+	if(input.heading) {
+		dv.paragraph(input.heading);
+	}
+	if(currentPageDate == null) {
+		dv.paragraph("> [!ERROR] Current page name is not a date. Probably a template. Showing everything.");
+	}
 }
 
 

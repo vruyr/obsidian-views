@@ -4,10 +4,6 @@ async function main() {
 	}
 	const currentPage = dv.current();
 	const currentPageDate = dv.date(currentPage.file.name);
-	if(currentPageDate == null) {
-		dv.paragraph("> [!ERROR] Current page title is not a date. Probably it's a template.");
-		return;
-	}
 
 	const pagesReferring = dv.pages().where(
 		p => (
@@ -24,10 +20,10 @@ async function main() {
 	);
 
 	if(pagesReferring.length) {
-		renderTheHeadingIfNotAlready();
+		renderTheHeadingIfNotAlready(currentPageDate);
 		dv.list(pagesReferring);
 	} else if(input.alwaysShow) {
-		renderTheHeadingIfNotAlready();
+		renderTheHeadingIfNotAlready(currentPageDate);
 		dv.paragraph("(none)");
 	}
 }
@@ -35,12 +31,18 @@ async function main() {
 
 let headingAlreadyRendered = false;
 
-function renderTheHeadingIfNotAlready() {
-	if(headingAlreadyRendered || !input.heading) {
+function renderTheHeadingIfNotAlready(currentPageDate) {
+	if(headingAlreadyRendered) {
 		return;
 	}
+
 	headingAlreadyRendered = true;
-	dv.paragraph(input.heading);
+	if(input.heading) {
+		dv.paragraph(input.heading);
+	}
+	if(currentPageDate == null) {
+		dv.paragraph("> [!ERROR] Current page name is not a date. Probably a template. Skipping date-based references.");
+	}
 }
 
 
@@ -88,6 +90,10 @@ function convertToDateTime(key, value) {
 }
 
 function pageHasFieldsForDay(page, date) {
+	if(date == null) {
+		return false;
+	}
+
 	for(let [key, value] of Object.entries(page)) {
 		if(key === "file" || key === "settings") {
 			continue;
