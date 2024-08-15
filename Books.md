@@ -44,7 +44,7 @@ const allBookPages = dv.pages('"Catalog/Books"');
 // Notes that are not formatted like a book
 //
 
-dv.paragraph("## Notes")
+dv.paragraph("## Non-Book Notes")
 dv.list(allBookPages
 	.where(i => !i.book)
 	.map(i => i.file.link)
