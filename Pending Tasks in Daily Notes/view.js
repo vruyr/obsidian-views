@@ -5,6 +5,12 @@ async function main() {
 	const TASK_STATUSES_NEW        = new Set([" "]);
 	const TASK_STATUSES_INACTIVE   = new Set([...TASK_STATUSES_DONE, ...TASK_STATUSES_NEW])
 
+	const PROJECT_PAGE_NAME_PATTERN = /\d\dW\d\d(D\d)?\b/;
+
+	function isActiveProjectPage(page) {
+		return PROJECT_PAGE_NAME_PATTERN.test(page.file.name) && isStatusActive(page)
+	}
+
 	while(!dv.current()) {
 		await sleep(100);
 	}
@@ -18,7 +24,7 @@ async function main() {
 
 	let numTaskListsRendered = 0;
 	for(const page of dv.pages()
-		.where(p => p.file?.tasks?.length)
+		.where(p => p.file?.tasks?.length || isActiveProjectPage(p))
 		.sort(p => p.file.name, "asc") //TODO Sort by task dates ascending using [due, started, added] as key.
 	) {
 		let tasksPending;
@@ -44,14 +50,17 @@ async function main() {
 		// Available tasks either should have no defer date or all the defer dates should be in the past.
 		const tasksAvailable = tasksPending.where(t => !isTaskDeferred(currentPageDate, t, page));
 
-		if(!tasksAvailable.length) {
+		//TODO Checking the PROJECT_PAGE_NAME_PATTERN the second time. Properly implement rendering project pages without tasks.
+		if(!tasksAvailable.length && !isActiveProjectPage(page)) {
 			continue;
 		}
 
 		renderTheHeadingIfNotAlready(currentPageDate);
 		dv.paragraph(`${input.pageHeadingPrefix}${page.file.folder ? page.file.folder + "/" : ""}[[/${page.file.path}|${page.file.name}]]`);
 		//TODO Render tasksAvailable with their ancestor chain. This will require building a proper tree to group multiple available tasks of a single parent task.
-		dv.taskList(tasksAvailable, false);
+		if(tasksAvailable.length) {
+			dv.taskList(tasksAvailable, /*groupByFile*/ false);
+		}
 		numTaskListsRendered += 1;
 	}
 
@@ -105,6 +114,45 @@ function getTaskDeferDate(task, page) {
 	}
 	//TODO Only consider page deferrals from the same heading as the task itself.
 	return [].concat(page.defer ?? [], task.defer ?? []).sort().last();
+}
+
+function isPageDeferred(relativeToDate, page) {
+	if(relativeToDate == null) {
+		return false;
+	}
+	const pageDeferDate = getPageDeferDate(page);
+	if(pageDeferDate == null) {
+		return false;
+	}
+	return dv.compare(relativeToDate, pageDeferDate) < 0;
+}
+
+function getPageDeferDate(page) {
+	return [].concat(page.defer ?? []).sort().last();
+}
+
+function getStatusFields(obj) {
+	return [].concat(
+		getFieldValues(obj, "done"),
+		getFieldValues(obj, "dropped"),
+		getFieldValues(obj, "started"),
+		getFieldValues(obj, "stopped"),
+	).sort((a, b) => dv.compare(a[1], b[1]));
+}
+
+function isStatusActive(obj) {
+	const mostRecentStatusField = getStatusFields(obj).last();
+	if(mostRecentStatusField == null) {
+		return true;
+	}
+	return !["done", "dropped"].includes(mostRecentStatusField[0]);
+}
+
+function getFieldValues(obj, fieldName) {
+	if(!obj || !fieldName) {
+		return null;
+	}
+	return [].concat(obj[fieldName] ?? []).map(x => [fieldName, x]);
 }
 
 
