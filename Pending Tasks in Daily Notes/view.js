@@ -7,10 +7,6 @@ async function main() {
 
 	const PROJECT_PAGE_NAME_PATTERN = /\d\dW\d\d(D\d)?\b/;
 
-	function isActiveProjectPage(page) {
-		return PROJECT_PAGE_NAME_PATTERN.test(page.file.name) && isStatusActive(page)
-	}
-
 	while(!dv.current()) {
 		await sleep(100);
 	}
@@ -22,9 +18,17 @@ async function main() {
 
 	dv.container.classList.add("no-task-highlight-started");
 
+	function isActiveProjectPage(relativeToDate, page) {
+		return (
+			PROJECT_PAGE_NAME_PATTERN.test(page.file.name)
+			&& !isPageDeferred(relativeToDate, page)
+			&& isStatusActive(page)
+		);
+	}
+
 	let numTaskListsRendered = 0;
 	for(const page of dv.pages()
-		.where(p => p.file?.tasks?.length || isActiveProjectPage(p))
+		.where(p => p.file?.tasks?.length || isActiveProjectPage(currentPageDate, p))
 		.sort(p => p.file.name, "asc") //TODO Sort by task dates ascending using [due, started, added] as key.
 	) {
 		let tasksPending;
@@ -51,7 +55,7 @@ async function main() {
 		const tasksAvailable = tasksPending.where(t => !isTaskDeferred(currentPageDate, t, page));
 
 		//TODO Checking the PROJECT_PAGE_NAME_PATTERN the second time. Properly implement rendering project pages without tasks.
-		if(!tasksAvailable.length && !isActiveProjectPage(page)) {
+		if(!tasksAvailable.length && !isActiveProjectPage(currentPageDate, page)) {
 			continue;
 		}
 
