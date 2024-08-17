@@ -4,8 +4,8 @@
 const libBookInfo = (new Function(
 	"dv",
 	//TODO Figure out how to make relative paths work for Dataview "view"s.
-	await dv.io.load("Views/Book Info/lib.js"))
-)(
+	await dv.io.load("Views/Book Info/lib.js")
+))(
 	dv
 );
 
