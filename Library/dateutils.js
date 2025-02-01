@@ -12,6 +12,22 @@ function momentToYearWeekDay(m) {
 }
 
 
+function yearWeekDayToMoment(str) {
+	const m = /^(\d\dW\d\d)D(\d)/.exec(str);
+	if(!m) {
+		return null;
+	}
+	return moment(
+		m[1],
+		"gg[W]ww"
+	).add(
+		parseInt(m[2]) - 1,
+		"d"
+	);
+}
+
+
 return {
 	momentToYearWeekDay,
+	yearWeekDayToMoment,
 }

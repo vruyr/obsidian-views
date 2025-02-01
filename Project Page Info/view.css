@@ -1,0 +1,7 @@
+table {
+	color: var(--text-faint);
+}
+
+table thead th {
+	display: none;
+}
