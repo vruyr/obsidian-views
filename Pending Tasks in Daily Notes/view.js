@@ -1,3 +1,6 @@
+const asynctools = (new Function("dv", await dv.io.load("Views/Library/asynctools.js")))(dv);
+
+
 async function main() {
 	const TASK_STATUSES_COMPLETED  = new Set(["x", "X"]);
 	const TASK_STATUSES_DROPPED    = new Set(["-"]);
@@ -7,10 +10,7 @@ async function main() {
 
 	const PROJECT_PAGE_NAME_PATTERN = /\d\dW\d\d(D\d)?\b/;
 
-	while(!dv.current()) {
-		await sleep(100);
-	}
-	const currentPage = dv.current();
+	const currentPage = await asynctools.waitForCurrentPage();
 	const currentPageDate = dv.date(currentPage.file.name);
 
 	// This day plus six days is a week.
@@ -176,12 +176,6 @@ function renderTheHeadingIfNotAlready(currentPageDate) {
 	}
 }
 
-
-async function sleep(milliseconds) {
-	await new Promise(resolve => {
-		setTimeout(resolve, milliseconds);
-	});
-}
 
 try {
 	main()

@@ -1,8 +1,8 @@
+const asynctools = (new Function("dv", await dv.io.load("Views/Library/asynctools.js")))(dv);
+
+
 async function main() {
-	while(!dv.current()) {
-		await sleep(100);
-	}
-	const currentPage = dv.current();
+	const currentPage = await asynctools.waitForCurrentPage();
 	const currentPageDate = dv.date(currentPage.file.name);
 
 	const pagesReferring = dv.pages().where(
@@ -127,11 +127,6 @@ function pageHasFieldsForDay(page, date) {
 	return false;
 }
 
-async function sleep(milliseconds) {
-	await new Promise(resolve => {
-		setTimeout(resolve, milliseconds);
-	});
-}
 
 try {
 	main()

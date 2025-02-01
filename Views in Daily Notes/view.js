@@ -1,6 +1,9 @@
+const asynctools = (new Function("dv", await dv.io.load("Views/Library/asynctools.js")))(dv);
+
+
 async function main() {
 	const currentDate = moment().startOf("day");
-	const currentPage = await waitForCurrentPage();
+	const currentPage = await asynctools.waitForCurrentPage();
 	const currentPageDate = moment(currentPage.file.name, "YYYY-MM-DD");
 
 	let currentPageTitle = `# ${currentPage.file.name}`;
@@ -73,19 +76,6 @@ function momentToYearWeekDay(m) {
 	return result;
 }
 
-async function waitForCurrentPage() {
-	let currentPage;
-	while(!(currentPage = dv.current())) {
-		await sleep(100);
-	}
-	return currentPage;
-}
-
-async function sleep(milliseconds) {
-	await new Promise(resolve => {
-		setTimeout(resolve, milliseconds);
-	});
-}
 
 try {
 	main()
