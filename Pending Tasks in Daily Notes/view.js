@@ -1,15 +1,8 @@
-const asynctools = (new Function("dv", await dv.io.load("Views/Library/asynctools.js")))(dv);
+const asynctools    = (new Function("dv", await dv.io.load("Views/Library/asynctools.js")))(dv);
+const taskStatuses  = (new Function("dv", await dv.io.load("Views/Library/taskStatuses.js")))(dv);
 
 
 async function main() {
-	const TASK_STATUSES_COMPLETED  = new Set(["x", "X"]);
-	const TASK_STATUSES_DROPPED    = new Set(["-"]);
-	const TASK_STATUSES_STARTED    = new Set(["/"]);
-	const TASK_STATUSES_SELECTED   = new Set(["*"]);
-	const TASK_STATUSES_DONE       = new Set([...TASK_STATUSES_COMPLETED, ...TASK_STATUSES_DROPPED])
-	const TASK_STATUSES_NEW        = new Set([" "]);
-	const TASK_STATUSES_INACTIVE   = new Set([...TASK_STATUSES_DONE, ...TASK_STATUSES_NEW])
-
 	const PROJECT_PAGE_NAME_PATTERN = /\d\dW\d\d(D\d)?\b/;
 
 	const currentPage = await asynctools.waitForCurrentPage();
@@ -34,16 +27,16 @@ async function main() {
 		if(taskStatus == null) {
 			return -1;
 		}
-		if(TASK_STATUSES_STARTED.has(taskStatus)) {
+		if(taskStatuses.STARTED.has(taskStatus)) {
 			return 1;
 		}
-		if(TASK_STATUSES_SELECTED.has(taskStatus)) {
+		if(taskStatuses.SELECTED.has(taskStatus)) {
 			return 2;
 		}
-		if(TASK_STATUSES_NEW.has(taskStatus)) {
+		if(taskStatuses.NEW.has(taskStatus)) {
 			return 3;
 		}
-		if(TASK_STATUSES_DONE.has(taskStatus)) {
+		if(taskStatuses.DONE.has(taskStatus)) {
 			return 4;
 		}
 		return -1;
@@ -76,12 +69,12 @@ async function main() {
 
 		if(showAllPendingTasks) {
 			// Take all pending tasks
-			tasksPending = page.file.tasks.where(t => !TASK_STATUSES_DONE.has(t.status));
+			tasksPending = page.file.tasks.where(t => !taskStatuses.DONE.has(t.status));
 		} else {
 			// For all other pages, take all pending but not untouched tasks.
 			tasksPending = page.file.tasks.where(t => (
-				!TASK_STATUSES_INACTIVE.has(t.status) ||
-				(!TASK_STATUSES_DONE.has(t.status) && isTaskDue(dueDateToShow, t))
+				!taskStatuses.INACTIVE.has(t.status) ||
+				(!taskStatuses.DONE.has(t.status) && isTaskDue(dueDateToShow, t))
 			));
 		}
 
