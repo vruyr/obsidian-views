@@ -17,7 +17,7 @@ async function main() {
 		return (
 			PROJECT_PAGE_NAME_PATTERN.test(page.file.name)
 			&& !isPageDeferred(relativeToDate, page)
-			&& isStatusActive(page)
+			&& taskStatuses.isStatusActive(page)
 		);
 	}
 
@@ -165,31 +165,6 @@ function isPageDeferred(relativeToDate, page) {
 function getPageDeferDate(page) {
 	return [].concat(page.defer ?? []).sort().last();
 }
-
-function getStatusFields(obj) {
-	return [].concat(
-		getFieldValues(obj, "done"),
-		getFieldValues(obj, "dropped"),
-		getFieldValues(obj, "started"),
-		getFieldValues(obj, "stopped"),
-	).sort((a, b) => dv.compare(a[1], b[1]));
-}
-
-function isStatusActive(obj) {
-	const mostRecentStatusField = getStatusFields(obj).last();
-	if(mostRecentStatusField == null) {
-		return true;
-	}
-	return !["done", "dropped"].includes(mostRecentStatusField[0]);
-}
-
-function getFieldValues(obj, fieldName) {
-	if(!obj || !fieldName) {
-		return null;
-	}
-	return [].concat(obj[fieldName] ?? []).map(x => [fieldName, x]);
-}
-
 
 let headingAlreadyRendered = false;
 

@@ -18,6 +18,11 @@ async function main() {
 	const numTasksSelected = tasks.filter(t => taskStatuses.SELECTED.has(t.status)).length;
 	const numTasksDone = tasks.filter(t => taskStatuses.DONE.has(t.status)).length;
 	const numTasksPending = numTasksAll - numTasksDone - numTasksStarted - numTasksSelected;
+	const latestStatus = taskStatuses.getStatusFields(projectPage).last() ?? null;
+	let latestStatusText = "none";
+	if(latestStatus) {
+		latestStatusText = `[${latestStatus[0]}::${latestStatus[1]}]`;
+	}
 
 	dv.paragraph(`# ${title}`);
 
@@ -28,6 +33,7 @@ async function main() {
 			["Project title", title],
 			["Tasks Done", `${numTasksDone} of ${numTasksAll} – ${Math.round(numTasksDone / numTasksAll * 100)}%`],
 			["Tasks Pending", ` ${numTasksStarted} started, ${numTasksSelected} selected, ${numTasksPending} pending`],
+			["Status", `${latestStatusText}`],
 		]
 	)
 }
