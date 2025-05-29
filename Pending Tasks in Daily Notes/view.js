@@ -43,12 +43,17 @@ async function main() {
 	}
 
 	function getTaskSortKey(task) {
-		return [task.due || now, task.started || now, getTaskStatusSortKey(task.status), task.added || now];
+		return [
+			task.due || now,
+			task.started || now,
+			getTaskStatusSortKey(task.status),
+			task.added || now,
+		];
 	}
 
 	function getPageSortKey(page) {
 		return [
-			...(page.file.tasks.map(getTaskSortKey).sort().first()),
+			...(page.file.tasks.map(getTaskSortKey).sort().first() ?? [getTaskSortKey({})]),
 			page.file.path
 		];
 	}
