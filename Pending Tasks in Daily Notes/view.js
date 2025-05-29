@@ -67,11 +67,10 @@ async function main() {
 	) {
 		let tasksPending;
 
-		let showAllPendingTasks = page.showAllPendingTasks || false;
-
-		if(isADailyJournalPageForPriorDay(currentPageDate, page)) {
-			showAllPendingTasks = true;
-		}
+		let showAllPendingTasks = (
+			isADailyJournalPageForPriorDay(currentPageDate, page) ||
+			taskStatuses.getStatusFields(page).last()?.[0] == "started"
+		);
 
 		if(showAllPendingTasks) {
 			// Take all pending tasks
