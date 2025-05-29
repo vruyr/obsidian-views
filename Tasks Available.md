@@ -1,9 +1,12 @@
 ---
-aliases: [Available Tasks]
+aliases:
+  - Available Tasks
+  - Tasks Pending
+  - Pending Tasks
 ---
 
 ```dataviewjs
-const COMPLETED_TASK_STATUSES = new Set(["x", "-"]);
+const COMPLETED_TASK_STATUSES = new Set(["x", "X", "-"]);
 
 for(const p of dv.pages()
 	.where(p => !p.file.path.startsWith("Templates/") && p.file.tasks.where(t => !t.completed).length)
