@@ -59,9 +59,13 @@ async function main() {
 		];
 	}
 
+	function shouldShowPageAsPending(page) {
+		return page.file?.tasks?.length || isActiveProjectPage(currentPageDate, page);
+	}
+
 	let numTaskListsRendered = 0;
 	for(const page of dv.pages()
-		.where(p => p.file?.tasks?.length || isActiveProjectPage(currentPageDate, p))
+		.where(shouldShowPageAsPending)
 		// Sort pages by oldest to newest [due, started, added] of any task on the page, then by page path.
 		.sort(getPageSortKey)
 	) {
