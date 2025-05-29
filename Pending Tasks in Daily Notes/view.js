@@ -3,7 +3,7 @@ const taskStatuses  = (new Function("dv", await dv.io.load("Views/Library/taskSt
 
 
 async function main() {
-	const PROJECT_PAGE_NAME_PATTERN = /\d\dW\d\d(D\d)?\b/;
+	const PROJECT_PAGE_NAME_PATTERN = /^\d\dW\d\d(D\d)?\b/;
 
 	const currentPage = await asynctools.waitForCurrentPage();
 	const currentPageDate = dv.date(currentPage.file.name);
@@ -16,8 +16,9 @@ async function main() {
 	function isActiveProjectPage(relativeToDate, page) {
 		return (
 			PROJECT_PAGE_NAME_PATTERN.test(page.file.name)
+			&& !page.file.name.startsWith("99W99D9 ")
 			&& !isPageDeferred(relativeToDate, page)
-			&& taskStatuses.isStatusActive(page)
+			&& !taskStatuses.isStatusInactive(page)
 		);
 	}
 

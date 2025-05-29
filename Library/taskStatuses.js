@@ -28,12 +28,12 @@ function getStatusFields(obj) {
 }
 
 
-function isStatusActive(obj) {
+function isStatusInactive(obj) {
 	const mostRecentStatusField = getStatusFields(obj).last();
 	if(mostRecentStatusField == null) {
-		return true;
+		return false;
 	}
-	return !["done", "dropped"].includes(mostRecentStatusField[0]);
+	return ["stopped", "done", "dropped"].includes(mostRecentStatusField[0]);
 }
 
 
@@ -47,5 +47,5 @@ return {
 	INACTIVE:   TASK_STATUSES_INACTIVE,
 	getFieldValues: getFieldValues,
 	getStatusFields: getStatusFields,
-	isStatusActive: isStatusActive,
+	isStatusInactive: isStatusInactive,
 };
