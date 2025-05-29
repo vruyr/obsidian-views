@@ -4,6 +4,8 @@ const asynctools = (new Function("dv", await dv.io.load("Views/Library/asynctool
 async function main() {
 	const TASK_STATUSES_COMPLETED  = new Set(["x", "X"]);
 	const TASK_STATUSES_DROPPED    = new Set(["-"]);
+	const TASK_STATUSES_STARTED    = new Set(["/"]);
+	const TASK_STATUSES_SELECTED   = new Set(["*"]);
 	const TASK_STATUSES_DONE       = new Set([...TASK_STATUSES_COMPLETED, ...TASK_STATUSES_DROPPED])
 	const TASK_STATUSES_NEW        = new Set([" "]);
 	const TASK_STATUSES_INACTIVE   = new Set([...TASK_STATUSES_DONE, ...TASK_STATUSES_NEW])
@@ -26,10 +28,43 @@ async function main() {
 		);
 	}
 
+	const now = dv.date("now");
+
+	function getTaskStatusSortKey(taskStatus) {
+		if(taskStatus == null) {
+			return -1;
+		}
+		if(TASK_STATUSES_STARTED.has(taskStatus)) {
+			return 1;
+		}
+		if(TASK_STATUSES_SELECTED.has(taskStatus)) {
+			return 2;
+		}
+		if(TASK_STATUSES_NEW.has(taskStatus)) {
+			return 3;
+		}
+		if(TASK_STATUSES_DONE.has(taskStatus)) {
+			return 4;
+		}
+		return -1;
+	}
+
+	function getTaskSortKey(task) {
+		return [task.due || now, task.started || now, getTaskStatusSortKey(task.status), task.added || now];
+	}
+
+	function getPageSortKey(page) {
+		return [
+			...(page.file.tasks.map(getTaskSortKey).sort().first()),
+			page.file.path
+		];
+	}
+
 	let numTaskListsRendered = 0;
 	for(const page of dv.pages()
 		.where(p => p.file?.tasks?.length || isActiveProjectPage(currentPageDate, p))
-		.sort(p => p.file.name, "asc") //TODO Sort by task dates ascending using [due, started, added] as key.
+		// Sort pages by oldest to newest [due, started, added] of any task on the page, then by page path.
+		.sort(getPageSortKey)
 	) {
 		let tasksPending;
 
@@ -63,7 +98,10 @@ async function main() {
 		dv.paragraph(`${input.pageHeadingPrefix}${page.file.folder ? page.file.folder + "/" : ""}[[/${page.file.path}|${page.file.name}]]`);
 		//TODO Render tasksAvailable with their ancestor chain. This will require building a proper tree to group multiple available tasks of a single parent task.
 		if(tasksAvailable.length) {
-			dv.taskList(tasksAvailable, /*groupByFile*/ false);
+			dv.taskList(
+				tasksAvailable.sort(getTaskSortKey),
+				/*groupByFile*/ false
+			);
 		}
 		numTaskListsRendered += 1;
 	}
