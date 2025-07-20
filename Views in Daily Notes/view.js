@@ -55,9 +55,7 @@ async function main() {
 
 	if(mustShowPendingTasks) {
 		await dv.view("Views/Pending Tasks in Daily Notes", {
-			heading: "## Pending",
-			pageHeadingPrefix: "### ",
-			alwaysShow: false,
+			headingLevel: 2,
 		});
 	}
 

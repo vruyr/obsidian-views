@@ -66,7 +66,26 @@ async function main() {
 		return page.file?.tasks?.length || isActiveProjectPage(currentPageDate, page);
 	}
 
-	let numTaskListsRendered = 0;
+	const pagesWithTasks = {
+		/* {page: {}, pageLastStatus: [], tasksAvailable: []} */
+		started: [],
+		pending: [],
+		stopped: [],
+	}
+
+	const pageSectionToHeadingMap = {
+		started: "Started",
+		stopped: "Stopped",
+		pending: "Pending",
+	};
+	function getHeadingNameForPendingPageSection(section) {
+		return pageSectionToHeadingMap[section] || section;
+	}
+
+	if(currentPageDate == null) {
+		dv.paragraph("> [!ERROR] Current page name is not a date. Probably a template. Showing everything.");
+	}
+
 	for(const page of dv.pages()
 		.where(shouldShowPageAsPending)
 		// Sort pages by oldest to newest [due, started, added] of any task on the page, then by page path.
@@ -74,9 +93,11 @@ async function main() {
 	) {
 		let tasksPending;
 
+		const pageLastStatus = taskStatuses.getStatusFields(page).last();
+
 		let showAllPendingTasks = (
 			isADailyJournalPageForPriorDay(currentPageDate, page) ||
-			taskStatuses.getStatusFields(page).last()?.[0] == "started"
+			pageLastStatus?.[0] == "started"
 		);
 
 		if(showAllPendingTasks) {
@@ -99,21 +120,42 @@ async function main() {
 			continue;
 		}
 
-		renderTheHeadingIfNotAlready(currentPageDate);
-		dv.paragraph(`${input.pageHeadingPrefix}${page.file.folder ? page.file.folder + "/" : ""}[[/${page.file.path}|${page.file.name}]]`);
-		//TODO Render tasksAvailable with their ancestor chain. This will require building a proper tree to group multiple available tasks of a single parent task.
-		if(tasksAvailable.length) {
-			dv.taskList(
-				tasksAvailable.sort(getTaskSortKey),
-				/*groupByFile*/ false
-			);
-		}
-		numTaskListsRendered += 1;
+		(pagesWithTasks[pageLastStatus?.at(0) || "pending"] ??= (new Array())).push({
+			page: page,
+			pageLastStatus: pageLastStatus,
+			tasksAvailable: tasksAvailable,
+		});
 	}
 
-	if(numTaskListsRendered == 0 && input.alwaysShow) {
-		renderTheHeadingIfNotAlready(currentPageDate);
-		dv.paragraph("(none)");
+	for(const [section, entries] of Object.entries(pagesWithTasks)) {
+		if(!entries.length) {
+			continue;
+		}
+
+		dv.paragraph(`${"#".repeat(input.headingLevel)} ${getHeadingNameForPendingPageSection(section)}`);
+
+		for(const {page, pageLastStatus, tasksAvailable} of entries) {
+			dv.paragraph(`${"#".repeat(1 + input.headingLevel)} ${page.file.folder ? page.file.folder + "/" : ""}[[/${page.file.path}|${page.file.name}]]`);
+			const pageFields = [];
+			//TODO Find exact location of status fields and point to those lines instead of recreating them. That way not only the entry will be a link, but also the justification text following the field will be shown as well as the preceeding date field of when the record was made.
+			if(pageLastStatus) {
+				pageFields.push(`[${pageLastStatus[0]}::${pageLastStatus[1]}]`);
+			}
+			const pageDeferDate = getPageDeferDate(page);
+			if(pageDeferDate) {
+				pageFields.push(`[defer::${pageDeferDate}]`);
+			}
+			if(pageFields) {
+				dv.paragraph(pageFields.join("\n"));
+			}
+			//TODO Render tasksAvailable with their ancestor chain. This will require building a proper tree to group multiple available tasks of a single parent task.
+			if(tasksAvailable.length) {
+				dv.taskList(
+					tasksAvailable.sort(getTaskSortKey),
+					/*groupByFile*/ false
+				);
+			}
+		}
 	}
 }
 
@@ -177,23 +219,6 @@ function isPageDeferred(relativeToDate, page) {
 function getPageDeferDate(page) {
 	return [].concat(page.defer ?? []).sort().last();
 }
-
-let headingAlreadyRendered = false;
-
-function renderTheHeadingIfNotAlready(currentPageDate) {
-	if(headingAlreadyRendered) {
-		return;
-	}
-
-	headingAlreadyRendered = true;
-	if(input.heading) {
-		dv.paragraph(input.heading);
-	}
-	if(currentPageDate == null) {
-		dv.paragraph("> [!ERROR] Current page name is not a date. Probably a template. Showing everything.");
-	}
-}
-
 
 try {
 	main()
