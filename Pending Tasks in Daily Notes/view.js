@@ -53,7 +53,10 @@ async function main() {
 	}
 
 	function getPageSortKey(page) {
+		pageLastStatus = taskStatuses.getStatusFields(page).last();
+
 		return [
+			...(pageLastStatus ? [getTaskStatusSortKey(pageLastStatus[0]), pageLastStatus[1]] : [0, now]),
 			...(page.file.tasks.map(getTaskSortKey).sort().first() ?? [getTaskSortKey({})]),
 			page.file.path
 		];
