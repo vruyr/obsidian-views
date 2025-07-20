@@ -48,12 +48,20 @@ async function main() {
 		return -1;
 	}
 
+	function getTaskDateAdded(task, defaultValue) {
+		return (
+			task.added
+			|| dv.date(task.path?.split(/[/\\]/).pop().replace(/\.[^.]+$/, ""))
+			|| defaultValue
+		);
+	}
+
 	function getTaskSortKey(task) {
 		return [
 			task.due || now,
 			task.started || now,
 			getTaskStatusSortKey(task.status),
-			task.added || now,
+			getTaskDateAdded(task, now),
 		];
 	}
 
