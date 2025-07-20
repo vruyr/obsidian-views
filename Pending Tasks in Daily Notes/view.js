@@ -15,8 +15,13 @@ async function main() {
 
 	function isActiveProjectPage(relativeToDate, page) {
 		return (
-			PROJECT_PAGE_NAME_PATTERN.test(page.file.name)
-			&& !page.file.name.startsWith("99W99D9 ")
+			(
+				(
+					PROJECT_PAGE_NAME_PATTERN.test(page.file.name)
+					&& !page.file.name.startsWith("99W99D9 ")
+				)
+				|| taskStatuses.getStatusFields(page).length
+			)
 			&& !isPageDeferred(relativeToDate, page)
 			&& !taskStatuses.isStatusInactive(page)
 		);
