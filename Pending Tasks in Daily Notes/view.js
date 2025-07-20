@@ -74,12 +74,14 @@ async function main() {
 	const pagesWithTasks = {
 		/* {page: {}, pageLastStatus: [], tasksAvailable: []} */
 		started: [],
+		done:    [],
 		pending: [],
 		stopped: [],
 	}
 
 	const pageSectionToHeadingMap = {
 		started: "Started",
+		done:    "⚠️ Marked as “done” with Tasks Pending ⚠️",
 		stopped: "Stopped",
 		pending: "Pending",
 	};
