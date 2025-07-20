@@ -20,10 +20,10 @@ function getFieldValues(obj, fieldName) {
 
 function getStatusFields(obj) {
 	return [].concat(
-		getFieldValues(obj, "done"),
-		getFieldValues(obj, "dropped"),
-		getFieldValues(obj, "started"),
-		getFieldValues(obj, "stopped"),
+		getFieldValues(obj, "done"),     // Fully completed. Not to be returned to.
+		getFieldValues(obj, "dropped"),  // Cancelled. Not to be returned to.
+		getFieldValues(obj, "started"),  // Currently in progress. Actively being worked on.
+		getFieldValues(obj, "stopped"),  // Previously worked on but not at the moment. To be returned to.
 	).sort((a, b) => dv.compare(a[1], b[1]));
 }
 
@@ -33,7 +33,7 @@ function isStatusInactive(obj) {
 	if(mostRecentStatusField == null) {
 		return false;
 	}
-	return ["stopped", "done", "dropped"].includes(mostRecentStatusField[0]);
+	return ["done", "dropped"].includes(mostRecentStatusField[0]);
 }
 
 
