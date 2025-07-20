@@ -53,6 +53,12 @@ async function main() {
 
 	dv.paragraph(currentPageTitle);
 
+	// Note that because all the subsequent `dv.paragraph();` calls are done from async functions,
+	// in order to preserve the correct order, any calls to `dv.paragraph()` after the first async
+	// call must be done after an explicit `await asynctools.sleep(0);`. Otherwise all the
+	// syncronous calls to `dv.paragraph();` from here will complete before the calls from async
+	// functions called from here.
+
 	if(mustShowPendingTasks) {
 		await dv.view("Views/Pending Tasks in Daily Notes", {
 			headingLevel: 2,
@@ -67,7 +73,7 @@ async function main() {
 
 
 try {
-	main()
+	await main()
 } catch(e) {
 	console.log(e);
 	throw e;

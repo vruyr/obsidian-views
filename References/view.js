@@ -129,7 +129,7 @@ function pageHasFieldsForDay(page, date) {
 
 
 try {
-	main()
+	await main()
 } catch(e) {
 	console.log(e);
 	throw e;
