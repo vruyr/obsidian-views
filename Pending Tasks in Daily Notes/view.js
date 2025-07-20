@@ -106,6 +106,31 @@ async function main() {
 		// Sort pages by oldest to newest [due, started, added] of any task on the page, then by page path.
 		.sort(getPageSortKey)
 	) {
+		/*TODO:vruyr Refactor:
+			const pendingPagesToShowAndTheirTasks = {
+				[section]: {
+					[page]: [...page.tasks.where(...)]
+				}
+			};
+			for(const page in dv.pages()...) {
+				if(isActiveProjectPage(currentPageDate, page)) {
+					pendingPagesToShowAndTheirTasks[getSection(page)][page] = []
+				}
+				for(const task in page.file.tasks.where(...)) {
+					if(mustShowTask(task)) {
+						pendingPagesToShowAndTheirTasks[getSection(task)].setDefault(page, []);
+						pendingPagesToShowAndTheirTasks[getSection(task)][page].push(task);
+					}
+				}
+			}
+			for(const [section, pages] of pendingPagesToShowAndTheirTasks) {
+				dv.paragraph(`## ${section}`);
+				for(const [page, tasks] of pages.sort(getPageSortKey)) {
+					dv.paragraph(`### ${page}`);
+					dv.taskList(tasks, groupByFile=false);
+				}
+			}
+		*/
 		let tasksPending;
 
 		const pageLastStatus = taskStatuses.getStatusFields(page).last();
