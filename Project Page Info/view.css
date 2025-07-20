@@ -1,3 +1,4 @@
+/* This interferes with regular tables.
 table {
 	color: var(--text-faint);
 }
@@ -5,3 +6,4 @@ table {
 table thead th {
 	display: none;
 }
+*/
