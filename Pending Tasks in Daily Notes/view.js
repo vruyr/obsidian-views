@@ -127,6 +127,7 @@ async function main() {
 			continue;
 		}
 
+		//TODO:vruyr: If page's last status is not "started" but it has a that that is started, split the page in two and show it both in "started" with only started tasks, and "pending" with the rest of the tasks.
 		(pagesWithTasks[pageLastStatus?.at(0) || "pending"] ??= (new Array())).push({
 			page: page,
 			pageLastStatus: pageLastStatus,
