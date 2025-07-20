@@ -13,11 +13,12 @@ async function main() {
 	}
 
 	const tasks = projectPage.file.tasks;
+	const tasksPending = tasks.filter(t => !taskStatuses.DONE.has(t.status));
 	const numTasksAll = tasks.length;
 	const numTasksStarted = tasks.filter(t => taskStatuses.STARTED.has(t.status)).length;
 	const numTasksSelected = tasks.filter(t => taskStatuses.SELECTED.has(t.status)).length;
 	const numTasksDone = tasks.filter(t => taskStatuses.DONE.has(t.status)).length;
-	const numTasksPending = numTasksAll - numTasksDone - numTasksStarted - numTasksSelected;
+	const numTasksOpen = numTasksAll - numTasksDone - numTasksStarted - numTasksSelected;
 	const latestStatus = taskStatuses.getStatusFields(projectPage).last() ?? null;
 	let latestStatusText = "none";
 	if(latestStatus) {
@@ -32,7 +33,7 @@ async function main() {
 			["Project date", date.format("dddd, MMMM D, YYYY")],
 			["Project title", title],
 			["Tasks Done", `${numTasksDone} of ${numTasksAll} – ${Math.round(numTasksDone / numTasksAll * 100)}%`],
-			["Tasks Pending", ` ${numTasksStarted} started, ${numTasksSelected} selected, ${numTasksPending} pending`],
+			["Tasks Pending", `${tasksPending.length} – ${numTasksStarted} started, ${numTasksSelected} selected, ${numTasksOpen} open`],
 			["Status", `${latestStatusText}`],
 		]
 	)
@@ -53,6 +54,10 @@ async function main() {
 	dv.paragraph("## Participants");
 	dv.paragraph(participants.join("\n"));
 
+
+	dv.paragraph("## Pending Tasks");
+	//TODO:vruyr Similar to Daily Note, also show tasks that has descendant tasks that are not done.
+	dv.taskList(tasksPending, false);
 }
 
 
