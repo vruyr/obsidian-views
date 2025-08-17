@@ -46,7 +46,10 @@ async function main() {
 		return m[1];
 	}
 
-	let participants = projectPage.file.outlinks.where(i => i.path.startsWith("People/"));
+	let participants = projectPage.file.outlinks.where(i => (
+		i.path.startsWith("People/")
+		|| i.path.startsWith("👤 ")
+	));
 	participants = new Set(participants.map(i => i.path));
 	participants = Array.from(participants).sort().map(path => {
 		return `- [[${path}|${personPagePathToName(path)}]]`;
