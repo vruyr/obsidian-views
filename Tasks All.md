@@ -4,6 +4,8 @@ aliases: [All Tasks]
 
 ```dataviewjs
 
+const taskStatuses = (new Function("dv", await dv.io.load("Views/Library/taskStatuses.js")))(dv);
+
 const allPagesWithTasks = (
 	dv.pages().file.tasks
 ).map(
@@ -22,7 +24,7 @@ const result = (
 ).map(
 	p => {
 		const alltasks = p.file.tasks;
-		const pending = p.file.tasks.where(t => !t.completed);
+		const pending = p.file.tasks.where(t => !taskStatuses.DONE.has(t.status));
 		const deferred = pending.where(t => (t.defer && dv.compare(t.defer, dv.date("now")) > 0));
 		return [
 			dv.fileLink(
