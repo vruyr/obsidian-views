@@ -47,7 +47,13 @@ const allBookPages = dv.pages('"Catalog/Books"');
 dv.paragraph("## Non-Book Notes")
 dv.list(allBookPages
 	.where(i => !i.book)
-	.map(i => i.file.link)
+	.map(i => {
+		return dv.fileLink(
+			i.file.path,
+			false,
+			app.metadataCache.getCache(i.file.path)?.headings?.find(h => h.level === 1)?.heading,
+		);
+	})
 );
 
 
