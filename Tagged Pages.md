@@ -1,7 +1,8 @@
 ---
 search: '-"Templates" and #Shopping and -#Shopping/Research and -#Shopping/Consumables and -#Shopping/Services'
-groupByTags: false
-hideFolderPaths:
+groupByTags:
+  - "#Shopping"
+hidePaths:
   - Notes
 ---
 
@@ -10,16 +11,29 @@ const current = dv.current();
 
 console.log("Searching for", JSON.stringify(current.search));
 
-function renderPage(p) {
+function renderPage(p, tagsToHide) {
 	const parts = p.file.path.replace(/\.md$/, "").split("/");
+	const name = parts.slice(-1);
 	let folder = parts.slice(0, -1).join("/");
-	if(current.hideFolderPaths.includes(folder)) {
+	if(current.hidePaths.includes(folder)) {
 		folder = "";
 	}
 	folder = folder ? folder + "/" : folder;
-	const name = parts.slice(-1);
-	const tags = Array.from(p.file.etags).toSorted().join(" ");
-	return `- (mtime::${p.file.mtime}) ${folder}[[${name}]] ${tags}`;
+	tagsToHide = new Set(tagsToHide);
+	const tagsToShow = p.file.etags.where(i => !tagsToHide.has(i));
+	return `- (mtime::${p.file.mtime}) ${folder}[[${name}]] ${tagsToShow.sort().join()}`;
+}
+
+function groupByTagsFilter(tag) {
+	if(!current.groupByTags?.length) {
+		return true;
+	}
+	for(const i of current.groupByTags) {
+		if(tag === i || tag.startsWith(i)) {
+			return true;
+		}
+	}
+	return false;
 }
 
 const pages = dv.pages(current.search)
@@ -28,10 +42,10 @@ const pages = dv.pages(current.search)
 
 let out;
 if(current.groupByTags) {
-	out = pages.groupBy(p => Array.from(p.file.etags).toSorted().join(" "))
+	out = pages.groupBy(p => Array.from(p.file.etags.where(groupByTagsFilter).sort()))
 	.flatMap(({key, rows}) => ([
-		`## ${key}`,
-		...(rows.sort(i => i.file.mtime, "desc").map(renderPage)),
+		`## ${key.join(" ")}`,
+		...(rows.sort(i => i.file.mtime, "desc").map(p => renderPage(p, key))),
 		""
 	]));
 } else {
