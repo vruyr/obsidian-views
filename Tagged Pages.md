@@ -1,6 +1,8 @@
 ---
 search: '-"Templates" and #Shopping and -#Shopping/Research and -#Shopping/Consumables and -#Shopping/Services'
 groupByTags: false
+hideFolderPaths:
+  - Notes
 ---
 
 ```dataviewjs
@@ -11,6 +13,9 @@ console.log("Searching for", JSON.stringify(current.search));
 function renderPage(p) {
 	const parts = p.file.path.replace(/\.md$/, "").split("/");
 	let folder = parts.slice(0, -1).join("/");
+	if(current.hideFolderPaths.includes(folder)) {
+		folder = "";
+	}
 	folder = folder ? folder + "/" : folder;
 	const name = parts.slice(-1);
 	const tags = Array.from(p.file.etags).toSorted().join(" ");
